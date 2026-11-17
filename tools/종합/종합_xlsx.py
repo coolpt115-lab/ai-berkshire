@@ -13,7 +13,7 @@ fh = Font(name=F, size=10, bold=True, color="FFFFFF"); ft = Font(name=F, size=14
 fn = Font(name=F, size=9, color="595959")
 fill_h = PatternFill("solid", fgColor="1F3864")
 fills = {"✅": PatternFill("solid", fgColor="C6EFCE"), "❓": PatternFill("solid", fgColor="FFEB9C"),
-         "⏳": PatternFill("solid", fgColor="DDEBF7"), "❌": PatternFill("solid", fgColor="FFC7CE")}
+         "⏳": PatternFill("solid", fgColor="DDEBF7"), "❌": PatternFill("solid", fgColor="FFC7CE"), "⛔": PatternFill("solid", fgColor="D9D9D9")}
 thin = Side(style="thin", color="A6A6A6"); box = Border(left=thin, right=thin, top=thin, bottom=thin)
 C = Alignment(horizontal="center", vertical="center", wrap_text=True)
 Lf = Alignment(horizontal="left", vertical="center", wrap_text=True)
@@ -64,7 +64,7 @@ t.conditional_formatting.add(f"O5:O{last}", CellIsRule(operator="lessThan", form
 
 # 요약
 s = wb.create_sheet("판정 요약", 0)
-s["A1"] = "KOSPI 1단계 통과 53곳 버핏 체크리스트 판정 요약"; s["A1"].font = ft
+s["A1"] = "KOSPI 1단계 통과 기업 버핏 체크리스트 판정 요약 (1단계 재판정 2026-11-17 반영)"; s["A1"].font = ft
 s["A2"] = "작성 2026-11-17 · 판정 기준 통일(reports/판정기준-통일-20261117.md) 적용 · 숫자는 다른 시트에서 수식으로 셈"; s["A2"].font = fn
 head(s, 4, ["단계", "구분", "기업 수", "비중", "기준"])
 J = f"'37곳 판정표'!$C$5:$C${last}"
@@ -73,12 +73,13 @@ steps = [
  ("0단계","제외: 리츠·인프라펀드","=COUNTIF('1단계 전체'!$E:$E,\"제외*\")","=C6/C5","별도 평가 기준 필요"),
  ("1단계","판정 대상","=C5-C6","=C7/C5","불량기업 걸러내기 7개 지표"),
  ("1단계","통과(예외 통과 포함)","=COUNTIF('1단계 전체'!$E:$E,\"통과\")+COUNTIF('1단계 전체'!$E:$E,\"예외 통과\")","=C8/C7","7개 지표 통과 또는 예외 충족"),
- ("2단계","정밀 체크리스트",f"=COUNTA('37곳 판정표'!$A$5:$A${last})","=C9/C8","6관 버핏 체크리스트"),
- ("2단계","빠른 판정만(가격 미달)",f"=COUNTA('16곳 가격 미달'!$A$5:$A$20)","=C10/C8","현재가가 중립 내재가치의 10% 할인 안쪽이거나 더 비쌈"),
+ ("2단계","정밀 체크리스트(재판정 전 선정)",f"=COUNTA('37곳 판정표'!$A$5:$A${last})","=C9/C8","6관 버핏 체크리스트"),
+ ("2단계","빠른 판정만(가격 미달)",f"=COUNTA('15곳 가격 미달'!$A$5:$A$20)","=C10/C8","현재가가 중립 내재가치의 10% 할인 안쪽이거나 더 비쌈"),
  ("판정","✅ 통과",f'=COUNTIF({J},"✅*")',"=C11/$C$9","품질 모두 ★3 이상 + 가격 합격 + 부결 0 + 거울 테스트 완성"),
  ("판정","❓ 회색지대",f'=COUNTIF({J},"❓*")',"=C12/$C$9","품질 결함 1개 + 가격 합격, 또는 거울 테스트 한 문장 미완성"),
  ("판정","⏳ 가격 대기",f'=COUNTIF({J},"⏳*")',"=C13/$C$9","품질 합격, 가격 불합격"),
  ("판정","❌ 부결",f'=COUNTIF({J},"❌*")',"=C14/$C$9","빠른 부결, ★1, 결함 2개 이상, 또는 결함 + 가격 불합격"),
+ ("판정","⛔ 1단계 탈락(재판정)",f'=COUNTIF({J},"⛔*")',"=C15/$C$9","도구 수정 후 1단계 재판정에서 탈락(진양산업·선진). 재판정 전 판정도 ❌"),
 ]
 for i, x in enumerate(steps):
     r = 5 + i
@@ -86,17 +87,17 @@ for i, x in enumerate(steps):
         c = cell(s, r, j, v, al=Lf if j in (2, 5) else C)
     s.cell(row=r, column=3).number_format = "#,##0"; s.cell(row=r, column=4).number_format = "0.0%"
     if x[0] == "판정": s.cell(row=r, column=2).fill = fills[x[1][0]]
-s["A16"] = "검산: 판정 합계"; s["A16"].font = fbold
-s["C16"] = "=SUM(C11:C14)"; s["D16"] = '=IF(C16=C9,"정밀 37곳과 일치","불일치")'
-s["A17"] = "검산: 정밀 + 빠른 판정"; s["A17"].font = fbold
-s["C17"] = "=C9+C10"; s["D17"] = '=IF(C17=C8,"1단계 통과 수와 일치","불일치")'
-s["A19"] = "✅ 통과 4곳은 모두 조건부 통과다. 공통 약점은 해자 추세가 불명확하다는 점이며, 다음 단계는 심층 연구다."; s["A19"].font = fn
+s["A17"] = "검산: 판정 합계"; s["A17"].font = fbold
+s["C17"] = "=SUM(C11:C15)"; s["D17"] = '=IF(C17=C9,"정밀 37곳과 일치","불일치")'
+s["A18"] = "검산: 정밀 − 1단계 탈락 + 빠른 판정"; s["A18"].font = fbold
+s["C18"] = "=C9-C15+C10"; s["D18"] = '=IF(C18=C8,"재판정 1단계 통과 수와 일치","불일치")'
+s["A20"] = "✅ 통과 4곳은 모두 조건부 통과다. 공통 약점은 해자 추세가 불명확하다는 점이며, 다음 단계는 심층 연구다."; s["A20"].font = fn
 widths(s, [10, 26, 10, 9, 60])
 
 # 16곳
-q = wb.create_sheet("16곳 가격 미달")
-q["A1"] = "정밀 체크리스트를 하지 않은 16곳 (빠른 판정 기준)"; q["A1"].font = ft
-q["A2"] = "사업·경영진 미평가. 빠른 판정은 krstock_screen.py 결함 수정 전 값이라 재판정 필요"; q["A2"].font = fn
+q = wb.create_sheet("15곳 가격 미달")
+q["A1"] = "정밀 체크리스트를 하지 않은 15곳 (빠른 판정 기준)"; q["A1"].font = ft
+q["A2"] = "사업·경영진 미평가. 2026-11-17 1단계 재판정에서 지표 값 변동 없음(SNT홀딩스는 탈락해 제외)"; q["A2"].font = fn
 head(q, 4, ["종목", "구분", "현재가(원)", "빠른 판정 중립 내재가치(원)", "현재가 위치(할인율)", "빠른 판정 분류"])
 for i, (n, g, p, iv, c) in enumerate(Q):
     r = 5 + i
