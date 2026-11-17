@@ -1,6 +1,6 @@
 {
-  "count": 2538,
-  "published": 2327,
+  "count": 2540,
+  "published": 2329,
   "drafts": 211,
   "reports": [
     {
@@ -1639,6 +1639,28 @@
       "series": "",
       "type": "底稿",
       "date": "2026-10-05",
+      "date_source": "文件名",
+      "ticker": ""
+    },
+    {
+      "title": "삼성전자 버핏식 매수 전 체크리스트",
+      "path": "reports/삼성전자/삼성전자-checklist-20261004.md",
+      "bucket": "公司",
+      "group": "삼성전자",
+      "series": "",
+      "type": "研究",
+      "date": "2026-10-04",
+      "date_source": "文件名",
+      "ticker": ""
+    },
+    {
+      "title": "LG씨엔에스 버핏식 매수 전 체크리스트",
+      "path": "reports/LG씨엔에스/LG씨엔에스-checklist-20261004.md",
+      "bucket": "公司",
+      "group": "LG씨엔에스",
+      "series": "",
+      "type": "研究",
+      "date": "2026-10-04",
       "date_source": "文件名",
       "ticker": ""
     },
